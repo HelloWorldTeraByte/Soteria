@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 
 #include "stm32f413xx.h"
 #include "sim808.h"
@@ -38,14 +39,30 @@ int main(void)
     GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR14_1);
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR14);
 
-    volatile char rx_buffer[256] = "";
+    char rx_buffer[256] = {0};
+
+    /*usart_snd_str("ATE0\r\n");*/
+    /*usart_recv_str(rx_buffer);*/
+    /*wait_unprecise(200000);*/
 
     usart_snd_str("AT\r");
-    rx_buffer[0] = usart_recv_char();
+    GPIOB->BSRR |= GPIO_BSRR_BS_7;
+    usart_recv_str(rx_buffer);
+
 
     if(rx_buffer[0] == 'O')
         GPIOB->BSRR |= GPIO_BSRR_BS_7;
+    else
+        GPIOB->BSRR |= GPIO_BSRR_BS_14;
+
+
+    /*if(strncmp(rx_buffer, "OK\r", strlen("OK\r")) == 0)*/
+        /*GPIOB->BSRR |= GPIO_BSRR_BS_7;*/
+    /*else*/
+        /*GPIOB->BSRR |= GPIO_BSRR_BS_14;*/
+
     wait_unprecise(200000);
+
 
     /*usart_snd_str("AT+CMGF=1\r");*/
     /*wait_unprecise(200000);*/
@@ -56,5 +73,6 @@ int main(void)
 
     while(1) {
         __asm__("NOP");
+
     }
 }

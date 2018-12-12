@@ -77,17 +77,28 @@ void usart_recv_wait(void)
         __asm__("NOP");
 }
 
-void usart_snd_char(uint8_t data)
+void usart_snd_char(uint16_t data)
 {
     usart_snd_wait();
     UART10->DR = data;
 }
 
-char usart_recv_char()
+uint16_t usart_recv_char(void)
 {
     usart_recv_wait();
-    uint8_t data = UART10->DR;
+    uint16_t data = UART10->DR;
     return data;
+}
+
+void usart_recv_str(char *buff)
+{
+    uint8_t cnt = 0;
+    buff[cnt] = usart_recv_char();
+
+    while(buff[cnt] != '\r') {
+        cnt++;
+        buff[cnt] = usart_recv_char();
+    }
 }
 
 void usart_snd_str(char *str)
@@ -97,6 +108,8 @@ void usart_snd_str(char *str)
         switch(*tmp) {
             case '\r':
                 usart_snd_char(0x0D);
+            case '\n':
+                usart_snd_char(0x0A);
             default:
                 usart_snd_char(*tmp);
         }
