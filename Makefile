@@ -24,6 +24,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 src/main.c \
+src/sim808.c \
 src/system_stm32f4xx.c
 
 # ASM sources
