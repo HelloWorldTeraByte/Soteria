@@ -1,3 +1,6 @@
+#define F_BUS_USART 16000000
+#define USART_BAUD 9600
+
 #include "stm32f413xx.h"
 
 void wait_unprecise(int moment)
@@ -59,7 +62,7 @@ void setup_usart(void)
     UART10->CR2 &= ~(USART_CR2_STOP_1);
 
     /*Set baudrate to be 9600*/
-    UART10->BRR = 16000000 / 9600;
+    UART10->BRR = F_BUS_USART / USART_BAUD;
 
     /*Parity disable*/
     UART10->CR1 &= ~(USART_CR1_PCE);
@@ -80,15 +83,14 @@ void usart_send_char(uint8_t data)
 void usart_send_str(char *str)
 {
     char *tmp;
-    for(tmp = str; *tmp != '\0'; tmp++)
-        usart_send_char(*tmp);
-}
-
-void usart_send_cmd(char *str)
-{
-    usart_send_str(str);
-    usart_send_char(0x0D);
-    wait_unprecise(200000);
+    for(tmp = str; *tmp != '\0'; tmp++) {
+        switch(*tmp) {
+            case '\r':
+                usart_send_char(0x0D);
+            default:
+                usart_send_char(*tmp);
+        }
+    }
 }
 
 int main(void)
@@ -104,11 +106,15 @@ int main(void)
     GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR7_1);
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR7);
 
-    /*usart_send_cmd("AT");*/
-    /*usart_send_cmd("AT+CMGF=1");*/
-    /*usart_send_cmd("AT+CMGS=\"+642108568818\"");*/
-    /*usart_send_cmd("Hello From STM32");*/
-    /*usart_send_char(0x1A);*/
+    usart_send_str("AT\r");
+    wait_unprecise(200000);
+    
+    usart_send_str("AT+CMGF=1\r");
+    wait_unprecise(200000);
+
+    usart_send_str("AT+CMGS=\"+642108568818\"\rWhats up!!");
+    wait_unprecise(200000);
+    usart_send_char(0x1A);
 
     while(1) {
         GPIOB->BSRR |= GPIO_BSRR_BS_7;
