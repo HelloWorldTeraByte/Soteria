@@ -94,9 +94,15 @@ void usart_recv_str(char *buff)
 {
     uint8_t cnt = 0;
     buff[cnt] = usart_recv_char();
+    cnt++;
+    buff[cnt] = usart_recv_char();
+    cnt++;
+    buff[cnt] = usart_recv_char();
 
-    while(buff[cnt] != '\r') {
+    while(buff[cnt] != '\n') {
         cnt++;
+        if(cnt > (RX_BUFF_SIZE -1))
+            break;
         buff[cnt] = usart_recv_char();
     }
 }

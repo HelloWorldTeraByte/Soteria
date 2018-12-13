@@ -6,8 +6,6 @@
 
 #define RX_BUFF_SIZE 256
 
-void UART10_IRQHandler(void);
-
 void setup_usart(void);
 
 void usart_snd_wait(void);

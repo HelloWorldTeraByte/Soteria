@@ -39,40 +39,43 @@ int main(void)
     GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR14_1);
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR14);
 
-    char rx_buffer[256] = {0};
+    char rx_buffer[RX_BUFF_SIZE] = {0};
 
-    /*usart_snd_str("ATE0\r\n");*/
-    /*usart_recv_str(rx_buffer);*/
-    /*wait_unprecise(200000);*/
+    usart_snd_str("ATE0\r\n");
+    usart_recv_str(rx_buffer);
+    wait_unprecise(10000);
 
-    usart_snd_str("AT\r");
-    GPIOB->BSRR |= GPIO_BSRR_BS_7;
+    usart_snd_str("AT\r\n");
     usart_recv_str(rx_buffer);
 
-
-    if(rx_buffer[0] == 'O')
+    if(strncmp(rx_buffer, "\r\nOK\r\n", strlen("\r\nOK\r\n")) == 0)
         GPIOB->BSRR |= GPIO_BSRR_BS_7;
     else
         GPIOB->BSRR |= GPIO_BSRR_BS_14;
 
-
-    /*if(strncmp(rx_buffer, "OK\r", strlen("OK\r")) == 0)*/
-        /*GPIOB->BSRR |= GPIO_BSRR_BS_7;*/
-    /*else*/
-        /*GPIOB->BSRR |= GPIO_BSRR_BS_14;*/
-
-    wait_unprecise(200000);
+    wait_unprecise(10000);
 
 
-    /*usart_snd_str("AT+CMGF=1\r");*/
-    /*wait_unprecise(200000);*/
+    usart_snd_str("AT+CMGF=1\r");
+    usart_recv_str(rx_buffer);
 
-    /*usart_snd_str("AT+CMGS=\"+642108568818\"\rYeeeet");*/
-    /*wait_unprecise(200000);*/
-    /*usart_snd_char(0x1A);*/
+    if(strncmp(rx_buffer, "\r\nOK\r\n", strlen("\r\nOK\r\n")) == 0)
+        GPIOB->BSRR |= GPIO_BSRR_BS_7;
+    else 
+        GPIOB->BSRR |= GPIO_BSRR_BS_14;
+
+    wait_unprecise(100000);
+
+    usart_snd_str("AT+CMGS=\"+642108568818\"\rYeeeet");
+    wait_unprecise(100000);
+    usart_snd_char(0x1A);
+    usart_recv_str(rx_buffer);
+    wait_unprecise(100000);
 
     while(1) {
         __asm__("NOP");
 
     }
+
+    return 0;
 }
