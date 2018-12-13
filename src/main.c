@@ -3,25 +3,14 @@
 
 #include "stm32f413xx.h"
 #include "sim808.h"
-
-void wait_unprecise(int moment)
-{
-    volatile uint32_t i, j;
-    for(i = 0; i < moment; i++) {
-        j++;
-    }
-}
+#include "delay.h"
 
 int main(void)
 {    
-    /*Enable clock for GPIO on Port B and Port E*/
+    GSM_init();
+
+    /*Enable clock for the LEDs*/
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOEEN;
-
-    /*Enable clock for UART10 on Port E*/
-    RCC->APB2ENR |= RCC_APB2ENR_UART10EN;
-
-    setup_usart();
 
     /*Setup up LED on PB7*/
     GPIOB->MODER |= GPIO_MODER_MODER7_0;
@@ -39,42 +28,10 @@ int main(void)
     GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR14_1);
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR14);
 
-    char rx_buffer[RX_BUFF_SIZE] = {0};
-
-    usart_snd_str("ATE0\r\n");
-    usart_recv_str(rx_buffer);
-    wait_unprecise(10000);
-
-    usart_snd_str("AT\r\n");
-    usart_recv_str(rx_buffer);
-
-    if(strncmp(rx_buffer, "\r\nOK\r\n", strlen("\r\nOK\r\n")) == 0)
-        GPIOB->BSRR |= GPIO_BSRR_BS_7;
-    else
-        GPIOB->BSRR |= GPIO_BSRR_BS_14;
-
-    wait_unprecise(10000);
-
-
-    usart_snd_str("AT+CMGF=1\r");
-    usart_recv_str(rx_buffer);
-
-    if(strncmp(rx_buffer, "\r\nOK\r\n", strlen("\r\nOK\r\n")) == 0)
-        GPIOB->BSRR |= GPIO_BSRR_BS_7;
-    else 
-        GPIOB->BSRR |= GPIO_BSRR_BS_14;
-
-    wait_unprecise(100000);
-
-    usart_snd_str("AT+CMGS=\"+642108568818\"\rYeeeet");
-    wait_unprecise(100000);
-    usart_snd_char(0x1A);
-    usart_recv_str(rx_buffer);
-    wait_unprecise(100000);
+    /*GSM_sms_snd("+642108568818", "Lets get this bread");*/
 
     while(1) {
         __asm__("NOP");
-
     }
 
     return 0;
