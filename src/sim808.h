@@ -22,4 +22,8 @@ void GSM_recv_str(char *buff);
 int buff_cmp(char *buff, char *msg);
 
 int GSM_sms_snd(char *number, char *msg);
+
+void GSM_iat(char *iat);
+void GSM_exp(char *exp);
+
 #endif

@@ -1,9 +1,13 @@
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <math.h>
 
 #include "stm32f413xx.h"
 #include "sim808.h"
 #include "delay.h"
+#include "jwt.h"
+
 
 int main(void)
 {    
@@ -28,7 +32,9 @@ int main(void)
     GPIOB->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR14_1);
     GPIOB->PUPDR &= ~(GPIO_PUPDR_PUPDR14);
 
-    /*GSM_sms_snd("+642108568818", "Lets get this bread");*/
+    /*GSM_sms_snd("+642108568818", pb64);*/
+
+    jwt_create();
 
     while(1) {
         __asm__("NOP");

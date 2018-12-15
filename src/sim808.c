@@ -180,3 +180,12 @@ int GSM_sms_snd(char *number, char *msg)
 
     return 0;
 }
+
+void GSM_iat(char *iat)
+{
+    iat = "12345";
+}
+void GSM_exp(char *exp)
+{
+    exp = "6789asd";
+}

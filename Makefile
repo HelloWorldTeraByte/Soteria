@@ -1,3 +1,4 @@
+#make CC=arm-none-eabi-gcc AR=arm-none-eabi-ar LD=arm-none-eabi-ld CFLAGS='--specs=nosys.specs -mfloat-abi=hard -mcpu=cortex-m4 -mfpu=fpv4-sp-d16'
 ######################################
 # target
 ######################################
@@ -11,7 +12,6 @@ DEBUG = 1
 # optimization
 OPT = -Og
 
-
 #######################################
 # paths
 #######################################
@@ -23,10 +23,11 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+src/system_stm32f4xx.c \
 src/main.c \
-src/sim808.c \
 src/delay.c \
-src/system_stm32f4xx.c
+src/sim808.c \
+src/jwt.c
 
 # ASM sources
 ASM_SOURCES =  \
@@ -82,7 +83,9 @@ AS_INCLUDES =
 
 # C includes
 C_INCLUDES =  \
--Iinclude/CMSIS
+-Iinclude \
+-Iinclude/CMSIS \
+-Iinclude/mbedtls
 
 
 # compile gcc flags
@@ -107,7 +110,10 @@ LDSCRIPT = STM32F413ZHTx_FLASH.ld
 
 # libraries
 LIBS = -lc -lm -lnosys
-LIBDIR =
+LIBDIR = /home/helloworldterabyte/Projects/Soteria/lib/libmbedtls.a \
+		 /home/helloworldterabyte/Projects/Soteria/lib/libmbedx509.a \
+		 /home/helloworldterabyte/Projects/Soteria/lib/libmbedcrypto.a
+
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
