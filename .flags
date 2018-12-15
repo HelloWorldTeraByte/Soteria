@@ -1,2 +1,4 @@
+-Iinclude
+-Iinclude/mbedtls
 -Iinclude/CMSIS
 -DSTM32F413xx
