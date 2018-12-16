@@ -33,6 +33,18 @@ src/jwt.c
 ASM_SOURCES =  \
 src/startup_stm32f413xx.s
 
+# C defines
+C_DEFS =  \
+-DSTM32F413xx
+
+# AS includes
+AS_INCLUDES =
+
+# C includes
+C_INCLUDES =  \
+-Iinclude \
+-Iinclude/CMSIS \
+-Iinclude/mbedtls
 
 #######################################
 # binaries
@@ -72,21 +84,6 @@ MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
 # macros for gcc
 # AS defines
 AS_DEFS =
-
-# C defines
-C_DEFS =  \
--DSTM32F413xx
-
-
-# AS includes
-AS_INCLUDES =
-
-# C includes
-C_INCLUDES =  \
--Iinclude \
--Iinclude/CMSIS \
--Iinclude/mbedtls
-
 
 # compile gcc flags
 ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
