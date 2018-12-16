@@ -1,6 +1,8 @@
 #ifndef __SIM808__H
 #define __SIM808__H
 
+#include <stdint.h>
+
 #define F_BUS_USART 16000000
 #define USART_BAUD 9600
 #define GSM_PORT GPIOE
