@@ -3,6 +3,6 @@
 
 #define PROJECT_ID "Soteria-2020"
 
-char *jwt_create();
+int jwt_create(char **jwt);
 
 #endif
