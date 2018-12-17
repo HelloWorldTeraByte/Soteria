@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "stm32f4xx.h"
 #include "sim808.h"
 #include "delay.h"
@@ -28,10 +29,14 @@ int main(void)
 
     /* GSM_sms_snd("+642108568818", "yeeeeeeeeeeeeeeeeeeeet"); */
 
-    jwt_create();
-
+    char *jwt = (char*)malloc(1);
+    jwt_create(&jwt);
+    free(jwt);
 
     while(1) {
+        GPIOB->BSRR |= GPIO_BSRR_BS_7;
+        wait_unprecise(200000);
+        GPIOB->BSRR |= GPIO_BSRR_BR_7;
         __asm__("NOP");
     }
 
