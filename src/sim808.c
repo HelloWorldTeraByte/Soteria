@@ -167,6 +167,7 @@ int GSM_sms_snd(char *number, char *msg)
 
     wait_unprecise(100000);
 
+    /* TODO: Better way to do this */
     char *snd_str = malloc((strlen(msg)+32) * sizeof(char));
     sprintf(snd_str, "AT+CMGS=\"%s\"\r%s", number, msg);
 
@@ -185,6 +186,7 @@ void GSM_iat(char *iat)
 {
     iat = "12345";
 }
+
 void GSM_exp(char *exp)
 {
     exp = "6789asd";
