@@ -1,4 +1,4 @@
-#make CC=arm-none-eabi-gcc AR=arm-none-eabi-ar LD=arm-none-eabi-ld CFLAGS='--specs=nosys.specs -mfloat-abi=hard -mcpu=cortex-m4 -mfpu=fpv4-sp-d16'
+#make CC=arm-none-eabi-gcc AR=arm-none-eabi-ar LD=arm-none-eabi-ld CFLAGS='--specs=nosys.specs -mfloat-abi=hard -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -g'
 ######################################
 # target
 ######################################
