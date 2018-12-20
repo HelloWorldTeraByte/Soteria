@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "mbedtls/base64.h"
 #include "mbedtls/sha256.h"
@@ -71,11 +72,11 @@
 
 int jwt_create(char **jwt)
 {
-    char header[] = "{\"alg\":\"RS256\",\"typ\":\"JWT\"}";
+    char header[] = "{\"typ\":\"JWT\",\"alg\":\"RS256\"}";
     char payload[64];
 
-    char iat[11] = "asdf";
-    char exp[11] = "asdf";
+    char *iat = GSM_iat();
+    char *exp = GSM_exp();
 
     strcpy(payload, "{\"iat\": ");
     strcat(payload, iat);
@@ -84,6 +85,9 @@ int jwt_create(char **jwt)
     strcat(payload, ",\"aud\": \"");
     strcat(payload, PROJECT_ID);
     strcat(payload, "\"}");
+
+    free(iat);
+    free(exp);
 
     size_t p_len = strlen(payload);
     size_t pb64_len;
@@ -110,13 +114,12 @@ int jwt_create(char **jwt)
     free(pb64);
     free(hb64);
 
-
-    unsigned char hash[32];
-    memset(hash, 0, 32);
+    unsigned char hash[33];
+    memset(hash, 0, 33);
     mbedtls_sha256_ret((const unsigned char*)hpb64, (hpb64_len-1), hash, 0);
 
     /* /1* TODO: Possibily remove sprintf *1/ */
-    /* unsigned char hash_str[64]; */
+    /* unsigned char hash_str[65]; */
     /* int i; */
     /* for(i = 0; i < 32; i++) */
     /*     sprintf((char*)&hash_str[i*2], "%02x ", hash[i]); */
@@ -150,10 +153,12 @@ int jwt_create(char **jwt)
     if((ret = mbedtls_rsa_pkcs1_sign(&rsa_cntx, NULL, NULL, MBEDTLS_RSA_PRIVATE, MBEDTLS_MD_SHA256, 32, hash, rsa_buf)) != 0)
         goto CLEANUP;
 
-    size_t s_len = strlen((const char*)rsa_buf);
+    /* size_t s_len = strlen((const char*)rsa_buf); */
+    size_t s_len = RSA_LEN;
     size_t sb64_len;
     mbedtls_base64url_encode(NULL, 0, &sb64_len, (const unsigned char*)rsa_buf, s_len);
     char *sb64 = (char*)malloc(sizeof(char)*sb64_len);
+    memset(sb64, 0, RSA_LEN);
     size_t sb64_w;
     mbedtls_base64url_encode((unsigned char *)sb64, sb64_len, &sb64_w, (const unsigned char*)rsa_buf, s_len);
     
