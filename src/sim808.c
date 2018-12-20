@@ -141,7 +141,6 @@ int GSM_sms_snd(char *number, char *msg)
 {    
     char rx_buffer[RX_BUFF_SIZE] = {0};
 
-
     GSM_snd_str("ATE0\r\n");
     GSM_recv_str(rx_buffer);
     wait_unprecise(10000);
@@ -182,12 +181,16 @@ int GSM_sms_snd(char *number, char *msg)
     return 0;
 }
 
-void GSM_iat(char *iat)
+char *GSM_iat()
 {
-    iat = "12345";
+    char *iat = (char *)malloc(sizeof(char)*11);
+    strcpy(iat, "1545296675");
+    return iat;
 }
 
-void GSM_exp(char *exp)
+char *GSM_exp()
 {
-    exp = "6789asd";
+    char *exp = (char *)malloc(sizeof(char)*11);
+    strcpy(exp, "1545332400");
+    return exp;
 }

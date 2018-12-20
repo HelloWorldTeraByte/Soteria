@@ -8,7 +8,7 @@
 #define GSM_PORT GPIOE
 #define GSM_USART UART10
 
-#define RX_BUFF_SIZE 256
+#define RX_BUFF_SIZE 4096
 
 void GSM_init(void);
 
@@ -25,7 +25,7 @@ int buff_cmp(char *buff, char *msg);
 
 int GSM_sms_snd(char *number, char *msg);
 
-void GSM_iat(char *iat);
-void GSM_exp(char *exp);
+char *GSM_iat(void);
+char *GSM_exp(void);
 
 #endif
