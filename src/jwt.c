@@ -70,7 +70,7 @@
     "f435f54602f756ac109310d372f8ff"\
     "026980f0f241fe4ebd"
 
-int jwt_create(char **jwt)
+uint8_t jwt_create(char **jwt)
 {
     char header[] = "{\"typ\":\"JWT\",\"alg\":\"RS256\"}";
     char payload[64];
