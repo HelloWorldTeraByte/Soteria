@@ -128,8 +128,7 @@ void GSM_recv_str(char *buff)
     }
 }
 
-
-int buff_cmp(char *buff, char *msg)
+uint8_t buff_cmp(char *buff, char *msg)
 {
     if(strncmp(buff, msg, strlen(msg)) == 0)
         return 1;
@@ -137,44 +136,34 @@ int buff_cmp(char *buff, char *msg)
         return 0;
 }
 
-int GSM_sms_snd(char *number, char *msg)
+uint8_t GSM_sms_snd(char *number, char *msg)
 {    
     char rx_buffer[RX_BUFF_SIZE] = {0};
 
-    GSM_snd_str("ATE0\r\n");
-    GSM_recv_str(rx_buffer);
+    uint8_t ret = 0;
+    ret = GSM_snd_ktry("ATE0\r\n", "ERROR", rx_buffer);
     wait_unprecise(10000);
+    ret = GSM_snd_ktry("AT\r\n", "ERROR", rx_buffer);
+    wait_unprecise(10000);
+    ret = GSM_snd_ktry("AT+CMGF=1\r\n", "ERROR", rx_buffer);
+    wait_unprecise(100000);
 
-    GSM_snd_str("AT\r\n");
+    char *snd_str = malloc((strlen(msg)+32) * sizeof(char));
+    strcpy(snd_str, "AT+CMGS=\"");
+    strcat(snd_str, number);
+    strcat(snd_str, "\"\r");
+    strcat(snd_str, msg);
+
+    ret = GSM_snd_ktry(snd_str, "ERROR", rx_buffer);
+    wait_unprecise(100000);
+    GSM_snd_char(CHAR_CTRL_Z);
     GSM_recv_str(rx_buffer);
+    wait_unprecise(100000);
 
-    if(buff_cmp(rx_buffer, "\r\nOK\r\n"))
+    if(ret == 0)
         GPIOB->BSRR |= GPIO_BSRR_BS_7;
     else
         GPIOB->BSRR |= GPIO_BSRR_BS_14;
-
-    wait_unprecise(10000);
-
-
-    GSM_snd_str("AT+CMGF=1\r");
-    GSM_recv_str(rx_buffer);
-
-    if(buff_cmp(rx_buffer, "\r\nOK\r\n"))
-        GPIOB->BSRR |= GPIO_BSRR_BS_7;
-    else 
-        GPIOB->BSRR |= GPIO_BSRR_BS_14;
-
-    wait_unprecise(100000);
-
-    /* TODO: Better way to do this */
-    char *snd_str = malloc((strlen(msg)+32) * sizeof(char));
-    sprintf(snd_str, "AT+CMGS=\"%s\"\r%s", number, msg);
-
-    GSM_snd_str(snd_str);
-    wait_unprecise(100000);
-    GSM_snd_char(0x1A);
-    GSM_recv_str(rx_buffer);
-    wait_unprecise(100000);
 
     free(snd_str);
 
@@ -184,13 +173,33 @@ int GSM_sms_snd(char *number, char *msg)
 char *GSM_iat()
 {
     char *iat = (char *)malloc(sizeof(char)*11);
-    strcpy(iat, "1545296675");
+    strcpy(iat, "1545348060");
     return iat;
 }
 
 char *GSM_exp()
 {
     char *exp = (char *)malloc(sizeof(char)*11);
-    strcpy(exp, "1545332400");
+    strcpy(exp, "1545384060");
     return exp;
+}
+
+uint8_t GSM_snd_ktry(char *cmd, char *err, char *buf)
+{
+    uint8_t i;
+    for(i = 0; i < RETRY_NUM; i++) {
+        memset(buf, 0, RX_BUFF_SIZE);
+        GSM_snd_str(cmd);
+        GSM_recv_str(buf);
+        /* If the err is not found in buffer */
+        if(strstr(buf, err) == NULL)
+            break;
+        /* Wait a bit and try again */
+        wait_unprecise(DELAY_FAIL);
+    }
+    /* We tried as many times as we could */
+    if(i >= (RETRY_NUM-1))
+        return -1;
+
+    return 0;
 }
